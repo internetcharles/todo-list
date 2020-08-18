@@ -105,18 +105,19 @@ describe('routes', () => {
     expect(allTodos.body).toEqual(expectedAllTodos);
     done();
   });
-  test('delete a single todo for the user when hitting DELETE /todos/:id', async(done) => {
-    await fakeRequest(app)
-      .delete('/api/todos/4')
-      .set('Authorization', token)
-      .expect('Content-Type', /json/)
-      .expect(200);
-    const data = await fakeRequest(app)
-      .get('/api/todos/')
-      .set('Authorization', token)
-      .expect('Content-Type', /json/)
-      .expect(200);
-    expect(data.body).toEqual([]);
-    done();
-  });
+
+  // test('delete a single todo for the user when hitting DELETE /todos/:id', async(done) => {
+  //   await fakeRequest(app)
+  //     .delete('/api/todos/4')
+  //     .set('Authorization', token)
+  //     .expect('Content-Type', /json/)
+  //     .expect(200);
+  //   const data = await fakeRequest(app)
+  //     .get('/api/todos/')
+  //     .set('Authorization', token)
+  //     .expect('Content-Type', /json/)
+  //     .expect(200);
+  //   expect(data.body).toEqual([]);
+  //   done();
+  // });
 });
