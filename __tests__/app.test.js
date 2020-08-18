@@ -90,7 +90,7 @@ describe('routes', () => {
     }];
 
     const data = await fakeRequest(app)
-      .put('/api/todos/4')
+      .put('/api/todos/3')
       .send(newTodo)
       .set('Authorization', token)
       .expect('Content-Type', /json/)
@@ -101,7 +101,7 @@ describe('routes', () => {
       .set('Authorization', token)
       .expect('Content-Type', /json/)
       .expect(200);
-    expect(data.body).toEqual(newGuitar);
+    expect(data.body).toEqual(newTodo);
     expect(allTodos.body).toEqual(expectedAllTodos);
     done();
   });
