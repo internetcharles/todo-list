@@ -1,13 +1,18 @@
 require('dotenv').config();
-
 const { execSync } = require('child_process');
-
 const fakeRequest = require('supertest');
 const app = require('../lib/app');
 const client = require('../lib/client');
 
-  describe('routes', () => {
-    let token;
+describe('routes', () => {
+  let token;
+
+  const newTodo = {
+    id: 3,
+    todo: 'eat lunch',
+    completed: false,
+    owner_id: 2,
+  };
 
   beforeAll(async done => {
     execSync('npm run setup-db');
@@ -22,33 +27,97 @@ const client = require('../lib/client');
     return done();
   });
 
-
   afterAll(done => {
     return client.end(done);
   });
 
-  test('returns todos', async() => {
-
-    const expectation = [
-      {
-        'id': 1,
-        'todo': 'take out trash',
-        'completed': false,
-        'owner_id': 1
-      },
-      {
-        'id': 2,
-        'todo': 'complete lab',
-        'completed': false,
-        'owner_id': 1
-      }
-    ];
-
+  test('returns a new guitar when creating new guitar', async(done) => {
     const data = await fakeRequest(app)
-      .get('/animals')
+      .post('/api/todos')
+      .send(newTodo)
+      .set('Authorization', token)
       .expect('Content-Type', /json/)
       .expect(200);
-
-    expect(data.body).toEqual(expectation);
+    expect(data.body).toEqual(newTodo);
+    done();
+  });
+  skip('returns all guitars for the user when hitting GET /guitars', async(done) => {
+    const expected = [
+      {
+        brand_name: 'Taylor',
+        color: 'red',
+        id: 4,
+        owner_id: 2,
+        strings: 4,
+      },
+    ];
+    const data = await fakeRequest(app)
+      .get('/api/guitars')
+      .set('Authorization', token)
+      .expect('Content-Type', /json/)
+      .expect(200);
+    expect(data.body).toEqual(expected);
+    done();
+  });
+  skip('returns a single guitar for the user when hitting GET /guitars/:id', async(done) => {
+    const expected = {
+      brand_name: 'Taylor',
+      color: 'red',
+      id: 4,
+      owner_id: 2,
+      strings: 4,
+    };
+    const data = await fakeRequest(app)
+      .get('/api/guitars/4')
+      .set('Authorization', token)
+      .expect('Content-Type', /json/)
+      .expect(200);
+    expect(data.body).toEqual(expected);
+    done();
+  });
+  skip('updates a single guitar for the user when hitting PUT /guitars/:id', async(done) => {
+    const newGuitar = {
+      brand_id: 1,
+      color: 'cool red',
+      id: 4,
+      owner_id: 2,
+      strings: 6,
+    };
+    const expectedAllGuitars = [{
+      brand_name: 'Gibson',      
+      color: 'cool red',
+      id: 4,
+      owner_id: 2,
+      strings: 6,
+    }];
+    const data = await fakeRequest(app)
+      .put('/api/guitars/4')
+      .send(newGuitar)
+      .set('Authorization', token)
+      .expect('Content-Type', /json/)
+      .expect(200);
+    const allGuitars = await fakeRequest(app)
+      .get('/api/guitars')
+      .send(newGuitar)
+      .set('Authorization', token)
+      .expect('Content-Type', /json/)
+      .expect(200);
+    expect(data.body).toEqual(newGuitar);
+    expect(allGuitars.body).toEqual(expectedAllGuitars);
+    done();
+  });
+  skip('delete a single guitar for the user when hitting DELETE /guitars/:id', async(done) => {
+    await fakeRequest(app)
+      .delete('/api/guitars/4')
+      .set('Authorization', token)
+      .expect('Content-Type', /json/)
+      .expect(200);
+    const data = await fakeRequest(app)
+      .get('/api/guitars/')
+      .set('Authorization', token)
+      .expect('Content-Type', /json/)
+      .expect(200);
+    expect(data.body).toEqual([]);
+    done();
   });
 });
