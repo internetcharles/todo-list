@@ -31,7 +31,7 @@ describe('routes', () => {
     return client.end(done);
   });
 
-  test('returns a new guitar when creating new guitar', async(done) => {
+  test('returns a new todo when creating new todo', async(done) => {
     const data = await fakeRequest(app)
       .post('/api/todos')
       .send(newTodo)
@@ -41,79 +41,78 @@ describe('routes', () => {
     expect(data.body).toEqual(newTodo);
     done();
   });
-  skip('returns all guitars for the user when hitting GET /guitars', async(done) => {
+  test('returns all todos for the user when hitting GET /todos', async(done) => {
     const expected = [
       {
-        brand_name: 'Taylor',
-        color: 'red',
-        id: 4,
+        id: 3,
+        todo: 'eat lunch',
+        completed: false,
         owner_id: 2,
-        strings: 4,
-      },
+      }
     ];
     const data = await fakeRequest(app)
-      .get('/api/guitars')
+      .get('/api/todos')
       .set('Authorization', token)
       .expect('Content-Type', /json/)
       .expect(200);
     expect(data.body).toEqual(expected);
     done();
   });
-  skip('returns a single guitar for the user when hitting GET /guitars/:id', async(done) => {
-    const expected = {
-      brand_name: 'Taylor',
-      color: 'red',
-      id: 4,
+  test('returns a single todo for the user when hitting GET /todos/:id', async(done) => {
+    const expected = [{
+      id: 3,
+      todo: 'eat lunch',
+      completed: false,
       owner_id: 2,
-      strings: 4,
-    };
-    const data = await fakeRequest(app)
-      .get('/api/guitars/4')
-      .set('Authorization', token)
-      .expect('Content-Type', /json/)
-      .expect(200);
-    expect(data.body).toEqual(expected);
-    done();
-  });
-  skip('updates a single guitar for the user when hitting PUT /guitars/:id', async(done) => {
-    const newGuitar = {
-      brand_id: 1,
-      color: 'cool red',
-      id: 4,
-      owner_id: 2,
-      strings: 6,
-    };
-    const expectedAllGuitars = [{
-      brand_name: 'Gibson',      
-      color: 'cool red',
-      id: 4,
-      owner_id: 2,
-      strings: 6,
     }];
     const data = await fakeRequest(app)
-      .put('/api/guitars/4')
-      .send(newGuitar)
+      .get('/api/todos/3')
       .set('Authorization', token)
       .expect('Content-Type', /json/)
       .expect(200);
-    const allGuitars = await fakeRequest(app)
-      .get('/api/guitars')
-      .send(newGuitar)
+    expect(data.body).toEqual(expected);
+    done();
+  });
+  test('updates a single todo for the user when hitting PUT /todos/:id', async(done) => {
+    const newTodo = 
+      {
+        id: 3,
+        todo: 'eat lunch',
+        completed: true,
+        owner_id: 2,
+      }
+    ;
+    const expectedAllTodos = [{
+      id: 3,
+      todo: 'eat lunch',
+      completed: true,
+      owner_id: 2,
+    }];
+
+    const data = await fakeRequest(app)
+      .put('/api/todos/4')
+      .send(newTodo)
+      .set('Authorization', token)
+      .expect('Content-Type', /json/)
+      .expect(200);
+    const allTodos = await fakeRequest(app)
+      .get('/api/todos')
+      .send(newTodo)
       .set('Authorization', token)
       .expect('Content-Type', /json/)
       .expect(200);
     expect(data.body).toEqual(newGuitar);
-    expect(allGuitars.body).toEqual(expectedAllGuitars);
+    expect(allTodos.body).toEqual(expectedAllTodos);
     done();
   });
-  skip('delete a single guitar for the user when hitting DELETE /guitars/:id', async(done) => {
+  test('delete a single todo for the user when hitting DELETE /todos/:id', async(done) => {
     await fakeRequest(app)
-      .delete('/api/guitars/4')
+      .delete('/api/todos/4')
       .set('Authorization', token)
       .expect('Content-Type', /json/)
       .expect(200);
     const data = await fakeRequest(app)
-      .get('/api/guitars/')
+      .get('/api/todos/')
       .set('Authorization', token)
       .expect('Content-Type', /json/)
       .expect(200);
